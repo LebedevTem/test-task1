@@ -24,6 +24,7 @@ public abstract class VocabularyService {
 //    }
 
     public List<String> readVocabularyList() {
+        createIfNotExists(getPath());
         try {
             return Files.readAllLines(getPath());
         } catch (IOException e) {
@@ -33,6 +34,7 @@ public abstract class VocabularyService {
     }
 
     public String getTranslation(String key) {
+        createIfNotExists(getPath());
         try (Stream<String> stream = Files.lines(getPath())) {
             return stream
                     .filter(s -> s.startsWith(key))
@@ -47,6 +49,7 @@ public abstract class VocabularyService {
 
     public boolean deleteRecord(String key) {
         Path filePath = getPath();
+        createIfNotExists(filePath);
 
         try (Stream<String> stream = Files.lines(filePath)) {
             List<String> updatedVoc = stream
@@ -61,10 +64,8 @@ public abstract class VocabularyService {
         }
     }
 
-    public boolean addRecord(String key, String value) {
-        if (!isKeyValid(key)) {
-            return false;
-        }
+    public void addRecord(String key, String value) {
+        createIfNotExists(getPath());
         if (containsRecord(key)) {
             deleteRecord(key);
         }
@@ -72,14 +73,12 @@ public abstract class VocabularyService {
             Files.writeString(getPath(),
                     key + SEPARATOR + value + System.lineSeparator(),
                     StandardOpenOption.APPEND);
-            return true;
         } catch (IOException e) {
             e.printStackTrace();
-            return false;
         }
     }
 
-    protected abstract boolean isKeyValid(String key);
+    public abstract boolean isKeyValid(String key);
 
     protected abstract Path getPath();
 
@@ -89,6 +88,16 @@ public abstract class VocabularyService {
         } catch (IOException e) {
             e.printStackTrace();
             return false;
+        }
+    }
+
+    private void createIfNotExists(Path path) {
+        try {
+            if (!Files.exists(path)) {
+                Files.createFile(path);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }

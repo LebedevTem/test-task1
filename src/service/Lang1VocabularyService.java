@@ -8,7 +8,7 @@ public class Lang1VocabularyService extends VocabularyService {
     private static final String PATH = "1.txt";
 
     @Override
-    protected boolean isKeyValid(String key) {
+    public boolean isKeyValid(String key) {
         return key.matches("[a-z]{4}");
     }
 

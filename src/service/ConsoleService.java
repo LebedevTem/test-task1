@@ -6,21 +6,18 @@ public class ConsoleService {
 
     public void start() {
         try (Scanner scanner = new Scanner(System.in)) {
-            printMainMenu();
-            VocabularyService vocabularyService = selectVocService(scanner);
-            doAction(vocabularyService, scanner);
+            selectVocabulary(scanner);
         }
     }
 
-    private VocabularyService selectVocService(Scanner scanner) {
-        while (true) {
+    private void selectVocabulary(Scanner scanner) {
+        boolean exit = false;
+        while (!exit) {
+            printVocabularySelectionMenu();
             switch (scanner.nextLine()) {
-                case "1" -> {
-                    return new Lang1VocabularyService();
-                }
-                case "2" -> {
-                    return new Lang2VocabularyService();
-                }
+                case "1" -> doAction(new Lang1VocabularyService(), scanner);
+                case "2" -> doAction(new Lang2VocabularyService(), scanner);
+                case "3" -> exit = true;
                 default -> invalidInputMsg();
             }
         }
@@ -51,12 +48,13 @@ public class ConsoleService {
                 case "4" -> {
                     System.out.println("Введите переводимое слово");
                     String key = scanner.nextLine();
-                    System.out.println("Введите перевод");
-                    String value = scanner.nextLine();
-                    if (vocabularyService.addRecord(key, value)) {
-                        System.out.println("Запись добавлена");
-                    } else {
+                    if (!vocabularyService.isKeyValid(key)) {
                         invalidInputMsg();
+                    } else {
+                        System.out.println("Введите перевод");
+                        String value = scanner.nextLine();
+                        vocabularyService.addRecord(key, value);
+                        System.out.println("Запись добавлена");
                     }
                 }
                 case "5" -> exit = true;
@@ -65,10 +63,11 @@ public class ConsoleService {
         }
     }
 
-    private void printMainMenu(){
+    private void printVocabularySelectionMenu() {
         System.out.println("Выберите язык:");
         System.out.println("- введите '1' для выбора языка №1");
         System.out.println("- введите '2' для выбора языка №2");
+        System.out.println("- введите '3' для выхода");
     }
 
     private void printActionSelectionMenu() {
@@ -77,7 +76,7 @@ public class ConsoleService {
         System.out.println("- введите '2' для удаления записи");
         System.out.println("- введите '3' для поиска перевода");
         System.out.println("- введите '4' для добавления записи");
-        System.out.println("- введите '5' для выхода");
+        System.out.println("- введите '5' для выхода в меню выбора словаря");
     }
 
     private void invalidInputMsg() {

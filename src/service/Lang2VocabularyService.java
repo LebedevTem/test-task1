@@ -8,7 +8,7 @@ public class Lang2VocabularyService extends VocabularyService {
     private static final String PATH = "2.txt";
 
     @Override
-    protected boolean isKeyValid(String key) {
+    public boolean isKeyValid(String key) {
         return key.matches("\\d{5}");
     }
 
